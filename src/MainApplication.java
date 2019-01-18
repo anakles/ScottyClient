@@ -98,18 +98,43 @@ public class MainApplication {
 			{
 		
 			case "sensor":
-				Motor.A.rotate(90);
-				Motor.A.rotate(-180);
+				//Looking right
 				Motor.A.rotate(90);
 				sensorsToLCD(distance, color);
 				distance.fetchSample(sampleSonic, 0);
 				color.fetchSample(sampleColor, 0);
 				String sonic = "Dist: "+sampleSonic[0];
-				String colorId = "Color ID; "+sampleColor[0];
-				//String red = " R:" + sampleColor[0];
-				//String green = " G:" + sampleColor[1];
-				//String blue = " B:" + sampleColor[2];
-				writeMsg(server, "" + sonic +" | ColorID: "+colorId);
+				String colorId = "Color ID: "+sampleColor[0];
+				writeMsg(server, "" + sonic +"|"+colorId);
+				Thread.sleep(100);
+				
+				//Looking left
+				Motor.A.rotate(-180);
+				sensorsToLCD(distance, color);
+				distance.fetchSample(sampleSonic, 0);
+				color.fetchSample(sampleColor, 0);
+				sonic = "Dist: "+sampleSonic[0];
+				colorId = "Color ID: "+sampleColor[0];
+				writeMsg(server, "" + sonic +"|"+colorId);
+				Thread.sleep(100);
+				
+				//Looking forward
+				Motor.A.rotate(90);
+				sensorsToLCD(distance, color);
+				distance.fetchSample(sampleSonic, 0);
+				color.fetchSample(sampleColor, 0);
+				sonic = "Dist: "+sampleSonic[0];
+				colorId = "Color ID: "+sampleColor[0];
+				writeMsg(server, "" + sonic +"|"+colorId);
+				
+				
+//				sensorsToLCD(distance, color);
+//				distance.fetchSample(sampleSonic, 0);
+//				color.fetchSample(sampleColor, 0);
+//				String sonic = "Dist: "+sampleSonic[0];
+//				String colorId = "Color ID: "+sampleColor[0];
+//				writeMsg(server, "" + sonic +" | ColorID: "+colorId);
+				
 				Thread.sleep(100);
 				writeMsg(server, "DONE");
 				break;
@@ -131,6 +156,11 @@ public class MainApplication {
 				
 			case "rechts":
 				pilot.rotate(command.value);
+				writeMsg(server, "DONE");
+				break;
+				
+			case "monte":
+				monteCarlo(server, pilot, distance, color);
 				writeMsg(server, "DONE");
 				break;
 				
@@ -205,4 +235,44 @@ public class MainApplication {
     	  	
     }
 	
+    
+    
+
+    private static void monteCarlo(Socket server, MovePilot pilot, SampleProvider distance, SampleProvider color) throws IOException
+    {
+		float[] sampleSonic = new float[distance.sampleSize()];
+		float[] sampleColor = new float[color.sampleSize()];
+    	sensorsToLCD(distance, color);
+    	color.fetchSample(sampleColor,0);
+    	String colorId = "" + sampleColor[0];
+    	String sonic = "" + sampleSonic[0];
+    	
+    	if(colorId.equals("7.0")) 
+    	{
+    		//looking forward
+			distance.fetchSample(sampleSonic, 0);
+			sonic = "Dist: "+sampleSonic[0];
+			writeMsg(server, "" + sonic + " 0");
+			
+			//Looking right
+			Motor.A.rotate(90);
+			distance.fetchSample(sampleSonic, 0);
+			sonic = "Dist: "+sampleSonic[0];
+			writeMsg(server, "" + sonic + " 0");
+			Motor.A.rotate(-90);
+			
+			//Looking left
+			Motor.A.rotate(-90);
+			distance.fetchSample(sampleSonic, 0);
+			sonic = "Dist: "+sampleSonic[0];
+			writeMsg(server, "" + sonic + " 0");
+			Motor.A.rotate(90);
+    		
+    	}
+    	else 
+    	{
+    		//TODO: find the street
+    	}
+    	
+    }
 }
